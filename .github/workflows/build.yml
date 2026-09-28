@@ -1,0 +1,33 @@
+name: CI Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - os: macos-latest
+          arch: arm64
+          runner: macos-latest
+          java-arch: aarch64
+          expander_leg: macos-latest--arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3.5.3
+
+    - name: Setup Java
+      uses: actions/setup-java@v3.11.0
+      with:
+        distribution: temurin
+        java-version: 8
+        architecture: ${{ matrix.java-arch }}
+        cache: maven
+
+    - name: Build
+      run: mvn -B -ntp verify
+    name: build [${{ matrix.expander_leg }}]
+    timeout-minutes: 150
